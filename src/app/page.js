@@ -1,95 +1,86 @@
-import Image from "next/image";
+"use client";
 import styles from "./page.module.css";
+import ToggleSection from "@components/ToggleSection";
+import TodoSection from "@components/TodoSection";
+import { HabitIcon, NoteIcon, ProhibitionIcon, TodoIcon } from "@icons/index";
+import { useLocalStorage } from "@hooks/index";
+import {
+  INITIAL_STATE_DAILY_TODOS,
+  INITIAL_STATE_WORK_TASKS,
+  TODO_SECTIONS,
+  TODO_TIME_FORMATS,
+} from "@constants/index";
+
+// export const TODO_SECTIONS_KEYS = {
+//   DAILY: "daily",
+//   WORK: "work",
+//   STUDY: "study",
+//   HEALTH: "health",
+//   MENTAL_HEALTH: "mental_health",
+//   SOCIAL: "social",
+// };
+
+export const APP_SECTIONS_KEYS = {
+  TO_DO: "to_do",
+  HABIT: "habit",
+  PROHIBITION: "prohibition",
+  NOTE: "note",
+};
+
+const APP_SECTIONS = [
+  { key: APP_SECTIONS_KEYS.TO_DO, label: "to do", icon: <TodoIcon /> },
+  { key: APP_SECTIONS_KEYS.HABIT, label: "habit", icon: <HabitIcon /> },
+  {
+    key: APP_SECTIONS_KEYS.PROHIBITION,
+    label: "prohibition",
+    icon: <ProhibitionIcon />,
+  },
+  { key: APP_SECTIONS_KEYS.NOTE, label: "note", icon: <NoteIcon /> },
+];
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [appSection, setAppSection] = useLocalStorage(
+    "app_section",
+    APP_SECTIONS[0].key
+  );
+  const [todoSection, setTodoSection] = useLocalStorage(
+    "todo_section",
+    Object.values(TODO_SECTIONS)[0].key
+  );
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  return (
+    <div className={`page-container glass ${styles.container}`}>
+      <div className={styles.header}>
+        <h5>Welcome back,</h5>
+        <h1>Kamil Garibov</h1>
+      </div>
+      <ToggleSection
+        sections={APP_SECTIONS}
+        defaultSection={appSection}
+        onChange={setAppSection}
+      />
+      {appSection === "to_do" && (
+        <>
+          <ToggleSection
+            sections={Object.values(TODO_SECTIONS)}
+            defaultSection={todoSection}
+            onChange={setTodoSection}
+          />
+          {todoSection === TODO_SECTIONS.DAILY.key ? (
+            <TodoSection
+              key={TODO_SECTIONS.DAILY.key}
+              dataKey={TODO_SECTIONS.DAILY}
+              initialState={INITIAL_STATE_DAILY_TODOS}
             />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          ) : todoSection === TODO_SECTIONS.WORK.key ? (
+            <TodoSection
+              key={TODO_SECTIONS.WORK.key}
+              dataKey={TODO_SECTIONS.WORK}
+              initialState={INITIAL_STATE_WORK_TASKS}
+            />
+          ) : null}
+        </>
+      )}
     </div>
   );
 }
